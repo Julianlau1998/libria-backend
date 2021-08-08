@@ -7,6 +7,7 @@ import (
 	"libria/topics"
 	"libria/utility"
 	"libria/votes"
+	"os"
 	"time"
 
 	"net/http"
@@ -63,5 +64,9 @@ func main() {
 	e.POST("/api/vote", VoteDelivery.Post)
 	e.PUT("/api/vote/:id", VoteDelivery.Update)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", port)))
 }
