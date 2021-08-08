@@ -63,5 +63,5 @@ func main() {
 	e.POST("/api/vote", VoteDelivery.Post)
 	e.PUT("/api/vote/:id", VoteDelivery.Update)
 
-	e.Logger.Fatal(e.Start(":1324"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
