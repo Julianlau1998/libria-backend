@@ -13,7 +13,21 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
+
+func CORSMiddlewareWrapper(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(ctx echo.Context) error {
+		req := ctx.Request()
+		dynamicCORSConfig := middleware.CORSConfig{
+			AllowOrigins: []string{req.Header.Get("Origin")},
+			AllowHeaders: []string{"*"},
+		}
+		CORSMiddleware := middleware.CORSWithConfig(dynamicCORSConfig)
+		CORSHandler := CORSMiddleware(next)
+		return CORSHandler(ctx)
+	}
+}
 
 var dbClient *sql.DB
 
