@@ -12,7 +12,7 @@ import (
 func NewDbClient() *sql.DB {
 	godotenv.Load(".env")
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
-		"password=%s dbname=%s sslmode=disable",
+		"password=%s dbname=%s sslmode=require",
 		os.Getenv("HOST"), os.Getenv("DB_PORT"), os.Getenv("dbUser"), os.Getenv("dbPassword"), os.Getenv("dbName"))
 	conn, err := sql.Open("postgres", psqlInfo)
 	if err != nil {
