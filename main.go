@@ -54,6 +54,8 @@ func main() {
 	TopicDelivery := topics.NewDelivery(TopicService)
 
 	e := echo.New()
+	e.Use(CORSMiddlewareWrapper)
+
 	e.HideBanner = true
 
 	e.GET("/", func(c echo.Context) error {
