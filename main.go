@@ -19,7 +19,7 @@ import (
 func CORSMiddlewareWrapper(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(ctx echo.Context) error {
 		dynamicCORSConfig := middleware.CORSConfig{
-			AllowOrigins: []string{"https://libria-app.com/"},
+			AllowOrigins: []string{"https://libria-app.com"},
 			AllowHeaders: []string{"*"},
 		}
 		CORSMiddleware := middleware.CORSWithConfig(dynamicCORSConfig)
