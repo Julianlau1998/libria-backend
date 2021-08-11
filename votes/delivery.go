@@ -2,7 +2,6 @@ package votes
 
 import (
 	"fmt"
-	"libria/auth"
 	"libria/models"
 	"net/http"
 
@@ -29,11 +28,11 @@ func (d *Delivery) GetAllByAnswer(c echo.Context) error {
 }
 
 func (d *Delivery) Post(c echo.Context) error {
-	req := c.Request()
-	headers := req.Header
-	if !auth.IsAuthorized(headers["Cookie"]) {
-		return c.String(http.StatusUnauthorized, "unauthorized")
-	}
+	// req := c.Request()
+	// headers := req.Header
+	// if !auth.IsAuthorized(headers["Cookie"]) {
+	// 	return c.String(http.StatusUnauthorized, "unauthorized")
+	// }
 	requestBody := new(models.Vote)
 	if err := c.Bind(requestBody); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
@@ -48,11 +47,11 @@ func (d *Delivery) Post(c echo.Context) error {
 }
 
 func (d *Delivery) Update(c echo.Context) (err error) {
-	req := c.Request()
-	headers := req.Header
-	if !auth.IsAuthorized(headers["Cookie"]) {
-		return c.String(http.StatusUnauthorized, "unauthorized")
-	}
+	// req := c.Request()
+	// headers := req.Header
+	// if !auth.IsAuthorized(headers["Cookie"]) {
+	// 	return c.String(http.StatusUnauthorized, "unauthorized")
+	// }
 	id := c.Param("id")
 	requestBody := new(models.Vote)
 	if err = c.Bind(requestBody); err != nil {
