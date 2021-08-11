@@ -21,7 +21,7 @@ func CORSMiddlewareWrapper(next echo.HandlerFunc) echo.HandlerFunc {
 		dynamicCORSConfig := middleware.CORSConfig{
 			AllowOrigins: []string{"https://libria-app.com"},
 			AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
-			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+			AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete, http.MethodOptions},
 		}
 		CORSMiddleware := middleware.CORSWithConfig(dynamicCORSConfig)
 		CORSHandler := CORSMiddleware(next)
