@@ -6,13 +6,14 @@ import (
 )
 
 type Topic struct {
-	ID          string `json:"id"`
-	UserID      string `json:"user_id"`
-	Title       string `json:"title"`
-	Body        string `json:"body"`
-	Username    string `json:"username"`
-	CreatedDate string `json:"created_date"`
-	UpdatedDate string `json:"updated_date"`
+	ID              string `json:"id"`
+	UserID          string `json:"user_id"`
+	Title           string `json:"title"`
+	Body            string `json:"body"`
+	Username        string `json:"username"`
+	CreatedDate     string `json:"created_date"`
+	UpdatedDate     string `json:"updated_date"`
+	AmountOfAnswers int    `json:"amount_of_answers"`
 }
 
 type TopicDB struct {

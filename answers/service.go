@@ -43,22 +43,24 @@ func (s *Service) GetAllByTopic(topicId string, userId string) ([]models.Answer,
 		log.Warnf("AnswerService.GetAllByTopic() Could notLoad Answers by topic: %s", err)
 		return answers, err
 	}
-	for index, answer := range answers {
-		votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID)
-		if err != nil {
-			log.Warnf("AnswerService.GetAllByTopic() Could notLoad Votes by Answer: %s", err)
-			return answers, err
-		}
-		for _, vote := range votesByAnswer {
-			if vote.UserID == userId && vote.Upvote == "true" {
-				answers[index].UpvotedByMe = true
-				answers[index].DownvotedByMe = false
-			} else if vote.UserID == userId && vote.Upvote == "false" {
-				answers[index].DownvotedByMe = true
-				answers[index].UpvotedByMe = false
+	if userId != "" {
+		for index, answer := range answers {
+			votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID)
+			if err != nil {
+				log.Warnf("AnswerService.GetAllByTopic() Could notLoad Votes by Answer: %s", err)
+				return answers, err
 			}
+			for _, vote := range votesByAnswer {
+				if vote.UserID == userId && vote.Upvote == "true" {
+					answers[index].UpvotedByMe = true
+					answers[index].DownvotedByMe = false
+				} else if vote.UserID == userId && vote.Upvote == "false" {
+					answers[index].DownvotedByMe = true
+					answers[index].UpvotedByMe = false
+				}
+			}
+			answers[index].Votes = votesByAnswer
 		}
-		answers[index].Votes = votesByAnswer
 	}
 	return answers, err
 }
