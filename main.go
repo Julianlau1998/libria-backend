@@ -67,6 +67,7 @@ func main() {
 	e.GET("/api/randomTopic", TopicDelivery.GetRandom)
 	e.POST("/api/topic", TopicDelivery.Post)
 	e.PUT("/api/topic/:id", TopicDelivery.Update)
+	e.PUT("/api/topicBestAnswer/:id", TopicDelivery.UpdateBestAnswer)
 	e.DELETE("/api/topic/:id", TopicDelivery.Delete)
 
 	e.GET("/api/answers", AnswerDelivery.GetAll)

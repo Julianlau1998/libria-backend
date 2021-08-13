@@ -81,6 +81,16 @@ func (d *Delivery) Update(c echo.Context) (err error) {
 	return c.JSON(http.StatusOK, topic)
 }
 
+func (d *Delivery) UpdateBestAnswer(c echo.Context) (err error) {
+	id := c.Param("id")
+	bestAnswer, err := d.topicService.UpdateBestAnswer(id)
+	if err != nil {
+		fmt.Println(err)
+		return c.String(http.StatusBadRequest, err.Error())
+	}
+	return c.JSON(http.StatusOK, bestAnswer)
+}
+
 func (d *Delivery) Delete(c echo.Context) (err error) {
 	// req := c.Request()
 	// headers := req.Header

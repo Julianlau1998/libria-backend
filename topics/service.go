@@ -87,6 +87,34 @@ func (s *Service) Update(id string, topic *models.Topic) (models.Topic, error) {
 	return s.topicRepo.Update(topic)
 }
 
+func (s *Service) UpdateBestAnswer(id string) (string, error) {
+	topic, err := s.GetById(id)
+	if err != nil {
+		log.Warnf("TopicService.UpdateBestAnswer() Could not Update BestAnswer: %s", err)
+	}
+	answers, err := s.answerService.GetAllByTopic(topic.ID, "")
+	if err != nil {
+		log.Warnf("TopicService.UpdateBestAnswer() Could load answers: %s", err)
+	}
+	bestAnswer := ""
+	mostVotes := 0
+	for _, answer := range answers {
+		votes := 0
+		for _, vote := range answer.Votes {
+			if vote.Upvote == "true" {
+				votes++
+			}
+		}
+		if votes > mostVotes {
+			mostVotes = votes
+			bestAnswer = answer.Text
+		}
+	}
+	topic.Body = bestAnswer
+	s.topicRepo.UpdateBestAnswer(&topic)
+	return bestAnswer, nil
+}
+
 func (s *Service) Delete(id string) (models.Topic, error) {
 	var topic models.Topic
 	topic.ID = id
