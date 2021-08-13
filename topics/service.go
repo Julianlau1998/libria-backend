@@ -108,10 +108,10 @@ func (s *Service) UpdateBestAnswer(id string) (string, error) {
 		if votes > mostVotes {
 			mostVotes = votes
 			bestAnswer = answer.Text
+			topic.Body = bestAnswer
+			s.topicRepo.UpdateBestAnswer(&topic)
 		}
 	}
-	topic.Body = bestAnswer
-	s.topicRepo.UpdateBestAnswer(&topic)
 	return bestAnswer, nil
 }
 
