@@ -38,7 +38,16 @@ func (s *Service) GetAll() ([]models.Topic, error) {
 }
 
 func (s *Service) GetById(id string) (models.Topic, error) {
-	return s.topicRepo.GetById(id)
+	topic, err := s.topicRepo.GetById(id)
+	if err != nil {
+		log.Warnf("topicsService GetById(), could not load topic: %s", err)
+	}
+	answers, err := s.answerService.GetAllByTopic(topic.ID, "")
+	if err != nil {
+		log.Warnf("topicsService GetById(), could not load answers: %s", err)
+	}
+	topic.AmountOfAnswers = len(answers)
+	return topic, nil
 }
 
 func (s *Service) GetRandom() (models.Topic, error) {
