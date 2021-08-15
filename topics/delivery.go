@@ -98,8 +98,10 @@ func (d *Delivery) Delete(c echo.Context) (err error) {
 	if !auth.IsAuthorized(headers["Cookie"]) {
 		return c.String(http.StatusUnauthorized, "unauthorized")
 	}
+	userId := headers.Get("userId")
 	id := c.Param("id")
-	topic, err := d.topicService.Delete(id)
+	//TODO Get userId from header userId
+	topic, err := d.topicService.Delete(id, userId)
 	if err != nil {
 		fmt.Println(err)
 		return c.String(http.StatusBadRequest, err.Error())

@@ -99,8 +99,6 @@ func (d *Delivery) Delete(c echo.Context) (err error) {
 	if err = c.Bind(requestBody); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
-	fmt.Print(requestBody.UserID)
-
 	if headers.Get("UserId") != requestBody.UserID {
 		return c.String(http.StatusUnauthorized, "unauthorized")
 	}

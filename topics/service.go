@@ -124,8 +124,9 @@ func (s *Service) UpdateBestAnswer(id string) (string, error) {
 	return bestAnswer, nil
 }
 
-func (s *Service) Delete(id string) (models.Topic, error) {
+func (s *Service) Delete(id string, userId string) (models.Topic, error) {
 	var topic models.Topic
 	topic.ID = id
+	topic.UserID = userId
 	return s.topicRepo.Delete(topic)
 }

@@ -52,8 +52,8 @@ func (r *Repository) UpdateBestAnswer(topic *models.Topic) (models.Topic, error)
 }
 
 func (r *Repository) Delete(topic models.Topic) (models.Topic, error) {
-	query := `DELETE FROM topics WHERE topic_id = $1`
-	_, err := r.dbClient.Exec(query, topic.ID)
+	query := `DELETE FROM topics WHERE topic_id = $1 AND UserID = $2`
+	_, err := r.dbClient.Exec(query, topic.ID, topic.UserID)
 	return topic, err
 }
 
