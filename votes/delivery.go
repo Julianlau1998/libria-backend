@@ -38,7 +38,9 @@ func (d *Delivery) Post(c echo.Context) error {
 	if err := c.Bind(requestBody); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
-
+	if headers.Get("UserId") != requestBody.UserID {
+		return c.String(http.StatusUnauthorized, "unauthorized")
+	}
 	vote, err := d.voteService.Post(requestBody)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
@@ -57,6 +59,9 @@ func (d *Delivery) Update(c echo.Context) (err error) {
 	requestBody := new(models.Vote)
 	if err = c.Bind(requestBody); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
+	}
+	if headers.Get("UserId") != requestBody.UserID {
+		return c.String(http.StatusUnauthorized, "unauthorized")
 	}
 	answer, err := d.voteService.Update(id, requestBody)
 	if err != nil {

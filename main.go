@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"libria/answers"
+	"libria/comments"
 	"libria/topics"
 	"libria/utility"
 	"libria/votes"
@@ -53,6 +54,10 @@ func main() {
 	TopicService := topics.NewService(TopicRepository, AnswerService)
 	TopicDelivery := topics.NewDelivery(TopicService)
 
+	CommentRepository := comments.NewRepository(dbClient)
+	CommentService := comments.NewService(CommentRepository)
+	CommentDelivery := comments.NewDelivery(CommentService)
+
 	e := echo.New()
 	e.Use(CORSMiddlewareWrapper)
 
@@ -76,6 +81,13 @@ func main() {
 	e.POST("/api/answer", AnswerDelivery.Post)
 	e.PUT("/api/answer/:id", AnswerDelivery.Update)
 	e.DELETE("/api/answer/:id", AnswerDelivery.Delete)
+
+	e.GET("/api/comments", CommentDelivery.GetAll)
+	e.GET("/api/comments/:answer_id", CommentDelivery.GetAllByAnswer)
+	e.GET("/api/comment/:id", CommentDelivery.GetById)
+	e.POST("/api/comment", CommentDelivery.Post)
+	e.PUT("/api/comment/:id", CommentDelivery.Update)
+	e.DELETE("/api/comment/:id", CommentDelivery.Delete)
 
 	e.GET("/api/votes/:answer_id", VoteDelivery.GetAllByAnswer)
 	e.POST("/api/vote", VoteDelivery.Post)
