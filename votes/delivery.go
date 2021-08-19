@@ -21,7 +21,7 @@ func NewDelivery(voteService Service) Delivery {
 
 func (d *Delivery) GetAllByAnswer(c echo.Context) error {
 	answerID := c.Param("answer_id")
-	votes, err := d.voteService.GetAllByAnswer(answerID)
+	votes, err := d.voteService.GetAllByAnswer(answerID, true)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}

@@ -15,10 +15,15 @@ func NewRepository(dbClient *sql.DB) Repository {
 	return Repository{dbClient: dbClient}
 }
 
-func (r *Repository) GetAllByAnswer(answerID string) ([]models.Vote, error) {
+func (r *Repository) GetAllByAnswer(answerID string, internal bool) ([]models.Vote, error) {
 	var votes []models.Vote
-	query := `SELECT * FROM votes WHERE answer_id = $1`
-	votes, err := r.fetch(query, answerID)
+	var query string
+	if internal {
+		query = `SELECT * FROM votes WHERE answer_id = $1`
+	} else {
+		query = `SELECT vote_id, answer_id, upvote FROM votes WHERE answer_id = $1`
+	}
+	votes, err := r.fetch(query, answerID, internal)
 	return votes, err
 }
 
@@ -35,11 +40,11 @@ func (r *Repository) Update(vote *models.Vote) (models.Vote, error) {
 	return *vote, err
 }
 
-func (r *Repository) fetch(query string, topicID string) ([]models.Vote, error) {
+func (r *Repository) fetch(query string, answerId string, internal bool) ([]models.Vote, error) {
 	var rows *sql.Rows
 	var err error
-	if len(topicID) > 0 {
-		rows, err = r.dbClient.Query(query, topicID)
+	if len(answerId) > 0 {
+		rows, err = r.dbClient.Query(query, answerId)
 	} else {
 		rows, err = r.dbClient.Query(query)
 	}
@@ -55,7 +60,11 @@ func (r *Repository) fetch(query string, topicID string) ([]models.Vote, error) 
 	result := make([]models.Vote, 0)
 	for rows.Next() {
 		voteDB := models.VoteDB{}
-		err := rows.Scan(&voteDB.ID, &voteDB.AnswerID, &voteDB.UserID, &voteDB.Upvote)
+		if internal {
+			err = rows.Scan(&voteDB.ID, &voteDB.AnswerID, &voteDB.UserID, &voteDB.Upvote)
+		} else {
+			err = rows.Scan(&voteDB.ID, &voteDB.AnswerID, &voteDB.Upvote)
+		}
 		if err != nil {
 			if err == sql.ErrNoRows {
 				continue

@@ -27,7 +27,7 @@ func (s *Service) GetAll() ([]models.Answer, error) {
 		return answers, err
 	}
 	for index, answer := range answers {
-		votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID)
+		votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID, false)
 		if err != nil {
 			log.Warnf("AnswerService.GetAllByTopic() Could no tLoad Votes by Answer: %s", err)
 			return answers, err
@@ -45,7 +45,7 @@ func (s *Service) GetAllByTopic(topicId string, userId string) ([]models.Answer,
 	}
 	if userId != "" {
 		for index, answer := range answers {
-			votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID)
+			votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID, true)
 			if err != nil {
 				log.Warnf("AnswerService.GetAllByTopic() Could not Load Votes by Answer: %s", err)
 				return answers, err
@@ -58,12 +58,13 @@ func (s *Service) GetAllByTopic(topicId string, userId string) ([]models.Answer,
 					answers[index].DownvotedByMe = true
 					answers[index].UpvotedByMe = false
 				}
+				vote.UserID = ""
 			}
 			answers[index].Votes = votesByAnswer
 		}
 	} else {
 		for index, answer := range answers {
-			votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID)
+			votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID, false)
 			if err != nil {
 				log.Warnf("AnswerService.GetAllByTopic() Could notLoad Votes by Answer: %s", err)
 				return answers, err
@@ -80,7 +81,7 @@ func (s *Service) GetById(id string) (models.Answer, error) {
 		log.Warnf("AnswerService.GetById() Could not Load answer by id: %s", err)
 		return answer, err
 	}
-	votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID)
+	votesByAnswer, err := s.voteService.GetAllByAnswer(answer.ID, false)
 	if err != nil {
 		log.Warnf("AnswerService.GetAllByTopic() Could no tLoad Votes by Answer: %s", err)
 		return answer, err
