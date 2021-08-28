@@ -13,6 +13,7 @@ type Comment struct {
 	Username    string `json:"username"`
 	CreatedDate string `json:"created_date"`
 	UpdatedDate string `json:"updated_date"`
+	Reported    bool   `json:"reported"`
 }
 
 type CommentDB struct {
@@ -23,6 +24,7 @@ type CommentDB struct {
 	Username    sql.NullString
 	CreatedDate sql.NullString
 	UpdatedDate sql.NullString
+	Reported    sql.NullBool
 }
 
 func (dbV *CommentDB) GetComment() (c Comment) {
@@ -33,5 +35,6 @@ func (dbV *CommentDB) GetComment() (c Comment) {
 	c.Username = utility.GetStringValue(dbV.Username)
 	c.CreatedDate = utility.GetStringValue(dbV.CreatedDate)
 	c.UpdatedDate = utility.GetStringValue(dbV.UpdatedDate)
+	c.Reported = dbV.Reported.Bool
 	return c
 }

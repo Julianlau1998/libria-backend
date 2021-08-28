@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"libria/answers"
 	"libria/comments"
+	"libria/reports"
 	"libria/topics"
 	"libria/utility"
 	"libria/votes"
@@ -58,6 +59,10 @@ func main() {
 	CommentService := comments.NewService(CommentRepository)
 	CommentDelivery := comments.NewDelivery(CommentService)
 
+	ReportRepository := reports.NewRepository(dbClient)
+	ReportService := reports.NewService(ReportRepository)
+	ReportDelivery := reports.NewDelivery(ReportService)
+
 	e := echo.New()
 	e.Use(CORSMiddlewareWrapper)
 
@@ -68,6 +73,7 @@ func main() {
 	})
 
 	e.GET("/api/topics", TopicDelivery.GetAll)
+	e.GET("/api/reported/topics", TopicDelivery.GetReported)
 	e.GET("/api/topic/:id", TopicDelivery.GetById)
 	e.GET("/api/randomTopic", TopicDelivery.GetRandom)
 	e.POST("/api/topic", TopicDelivery.Post)
@@ -76,6 +82,7 @@ func main() {
 	e.DELETE("/api/topic/:id", TopicDelivery.Delete)
 
 	e.GET("/api/answers", AnswerDelivery.GetAll)
+	e.GET("/api/reported/answers", AnswerDelivery.GetReported)
 	e.GET("/api/answers/:topic_id", AnswerDelivery.GetAllByTopic)
 	e.GET("/api/answer/:id", AnswerDelivery.GetById)
 	e.POST("/api/answer", AnswerDelivery.Post)
@@ -83,11 +90,15 @@ func main() {
 	e.DELETE("/api/answer/:id", AnswerDelivery.Delete)
 
 	e.GET("/api/comments", CommentDelivery.GetAll)
+	e.GET("/api/reported/comments", CommentDelivery.GetReported)
 	e.GET("/api/comments/:answer_id", CommentDelivery.GetAllByAnswer)
 	e.GET("/api/comment/:id", CommentDelivery.GetById)
 	e.POST("/api/comment", CommentDelivery.Post)
 	e.PUT("/api/comment/:id", CommentDelivery.Update)
 	e.DELETE("/api/comment/:id", CommentDelivery.Delete)
+
+	e.PUT("/api/report/:id", ReportDelivery.Report)
+	e.PUT("/api/unreport/:id", ReportDelivery.Unreport)
 
 	e.GET("/api/votes/:answer_id", VoteDelivery.GetAllByAnswer)
 	e.POST("/api/vote", VoteDelivery.Post)

@@ -1,7 +1,6 @@
 package answers
 
 import (
-	"fmt"
 	"libria/auth"
 	"libria/models"
 	"net/http"
@@ -21,6 +20,14 @@ func NewDelivery(answerService Service) Delivery {
 
 func (d *Delivery) GetAll(c echo.Context) error {
 	answers, err := d.answerService.GetAll()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, answers)
+}
+
+func (d *Delivery) GetReported(c echo.Context) error {
+	answers, err := d.answerService.GetReported()
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
@@ -84,7 +91,6 @@ func (d *Delivery) Update(c echo.Context) (err error) {
 	}
 	answer, err := d.answerService.Update(id, requestBody)
 	if err != nil {
-		fmt.Println(err)
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, answer)
@@ -93,6 +99,7 @@ func (d *Delivery) Update(c echo.Context) (err error) {
 func (d *Delivery) Delete(c echo.Context) (err error) {
 	req := c.Request()
 	headers := req.Header
+	var isAdmin bool
 	if !auth.IsAuthorized(headers["Cookie"]) {
 		return c.String(http.StatusUnauthorized, "unauthorized")
 	}
@@ -102,11 +109,17 @@ func (d *Delivery) Delete(c echo.Context) (err error) {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	if headers.Get("UserId") != requestBody.UserID {
-		return c.String(http.StatusUnauthorized, "unauthorized")
+		for _, admin := range auth.Admins() {
+			if headers.Get("UserId") == admin {
+				isAdmin = true
+			}
+		}
+		if isAdmin != true {
+			return c.String(http.StatusUnauthorized, "unauthorized")
+		}
 	}
 	answer, err := d.answerService.Delete(id)
 	if err != nil {
-		fmt.Println(err)
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, answer)

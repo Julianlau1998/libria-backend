@@ -14,6 +14,7 @@ type Topic struct {
 	CreatedDate     string `json:"created_date"`
 	UpdatedDate     string `json:"updated_date"`
 	AmountOfAnswers int    `json:"amount_of_answers"`
+	Reported        bool   `json:"reported"`
 }
 
 type TopicDB struct {
@@ -24,6 +25,7 @@ type TopicDB struct {
 	Username    sql.NullString
 	CreatedDate sql.NullString
 	UpdatedDate sql.NullString
+	Reported    sql.NullBool
 }
 
 func (dbV *TopicDB) GetTopic() (t Topic) {
@@ -34,5 +36,6 @@ func (dbV *TopicDB) GetTopic() (t Topic) {
 	t.Username = utility.GetStringValue(dbV.Username)
 	t.CreatedDate = utility.GetStringValue(dbV.CreatedDate)
 	t.UpdatedDate = utility.GetStringValue(dbV.UpdatedDate)
+	t.Reported = dbV.Reported.Bool
 	return t
 }

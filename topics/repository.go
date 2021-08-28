@@ -18,7 +18,14 @@ func NewRepository(dbClient *sql.DB) Repository {
 
 func (r *Repository) GetAll() ([]models.Topic, error) {
 	var topics []models.Topic
-	query := `SELECT topic_id, Username, title, body, created_date, updated_date FROM topics`
+	query := `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics`
+	topics, err := r.fetch(query)
+	return topics, err
+}
+
+func (r *Repository) GetReported() ([]models.Topic, error) {
+	var topics []models.Topic
+	query := `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics WHERE reported = true`
 	topics, err := r.fetch(query)
 	return topics, err
 }
@@ -26,7 +33,7 @@ func (r *Repository) GetAll() ([]models.Topic, error) {
 func (r *Repository) GetById(id string) (models.Topic, error) {
 	var topic models.Topic
 
-	query := `SELECT topic_id, Username, title, body, created_date, updated_date FROM topics WHERE topic_id = $1`
+	query := `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics WHERE topic_id = $1`
 	topic, err := r.getOne(query, id)
 	return topic, err
 }
@@ -57,6 +64,12 @@ func (r *Repository) Delete(topic models.Topic) (models.Topic, error) {
 	return topic, err
 }
 
+func (r *Repository) DeleteAsAdmin(topic models.Topic) (models.Topic, error) {
+	query := `DELETE FROM topics WHERE topic_id = $1`
+	_, err := r.dbClient.Exec(query, topic.ID)
+	return topic, err
+}
+
 func (r *Repository) fetch(query string) ([]models.Topic, error) {
 	rows, err := r.dbClient.Query(query)
 	if err != nil {
@@ -71,7 +84,7 @@ func (r *Repository) fetch(query string) ([]models.Topic, error) {
 	result := make([]models.Topic, 0)
 	for rows.Next() {
 		topicDB := models.TopicDB{}
-		err := rows.Scan(&topicDB.ID, &topicDB.Username, &topicDB.Title, &topicDB.Body, &topicDB.CreatedDate, &topicDB.UpdatedDate)
+		err := rows.Scan(&topicDB.ID, &topicDB.Username, &topicDB.Title, &topicDB.Body, &topicDB.Reported, &topicDB.CreatedDate, &topicDB.UpdatedDate)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				continue
@@ -86,7 +99,7 @@ func (r *Repository) fetch(query string) ([]models.Topic, error) {
 
 func (r *Repository) getOne(query string, id string) (models.Topic, error) {
 	topicDB := models.TopicDB{}
-	err := r.dbClient.QueryRow(query, id).Scan(&topicDB.ID, &topicDB.Username, &topicDB.Title, &topicDB.Body, &topicDB.CreatedDate, &topicDB.UpdatedDate)
+	err := r.dbClient.QueryRow(query, id).Scan(&topicDB.ID, &topicDB.Username, &topicDB.Title, &topicDB.Body, &topicDB.Reported, &topicDB.CreatedDate, &topicDB.UpdatedDate)
 	if err != nil && err != sql.ErrNoRows {
 		log.Infof("Fehler beim Lesen der Daten: %v", err)
 	}

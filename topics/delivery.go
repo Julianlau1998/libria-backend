@@ -1,7 +1,6 @@
 package topics
 
 import (
-	"fmt"
 	"libria/auth"
 	"libria/models"
 	"net/http"
@@ -26,6 +25,15 @@ func (d *Delivery) GetAll(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, topics)
 }
+
+func (d *Delivery) GetReported(c echo.Context) error {
+	topics, err := d.topicService.GetReported()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, topics)
+}
+
 func (d *Delivery) GetById(c echo.Context) error {
 	id := c.Param("id")
 	topic, err := d.topicService.GetById(id)
@@ -79,7 +87,6 @@ func (d *Delivery) Update(c echo.Context) (err error) {
 	}
 	topic, err := d.topicService.Update(id, requestBody)
 	if err != nil {
-		fmt.Println(err)
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, topic)
@@ -89,7 +96,6 @@ func (d *Delivery) UpdateBestAnswer(c echo.Context) (err error) {
 	id := c.Param("id")
 	bestAnswer, err := d.topicService.UpdateBestAnswer(id)
 	if err != nil {
-		fmt.Println(err)
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, bestAnswer)
@@ -98,15 +104,27 @@ func (d *Delivery) UpdateBestAnswer(c echo.Context) (err error) {
 func (d *Delivery) Delete(c echo.Context) (err error) {
 	req := c.Request()
 	headers := req.Header
+	var isAdmin bool
 	if !auth.IsAuthorized(headers["Cookie"]) {
 		return c.String(http.StatusUnauthorized, "unauthorized")
 	}
 	userId := headers.Get("userId")
 	id := c.Param("id")
-	//TODO Get userId from header userId
+	for i := 0; i < len(auth.Admins()); i++ {
+		if userId == auth.Admins()[i] {
+			isAdmin = true
+		}
+	}
+	if isAdmin == true {
+		topic, err := d.topicService.DeleteAsAdmin(id, userId)
+		if err != nil {
+			return c.String(http.StatusBadRequest, err.Error())
+		}
+		return c.JSON(http.StatusOK, topic)
+	}
+
 	topic, err := d.topicService.Delete(id, userId)
 	if err != nil {
-		fmt.Println(err)
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, topic)

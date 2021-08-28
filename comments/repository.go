@@ -18,14 +18,21 @@ func NewRepository(dbClient *sql.DB) Repository {
 
 func (r *Repository) GetAll() ([]models.Comment, error) {
 	var comments []models.Comment
-	query := `SELECT id, answer_id, Username, comment_text, created_date, updated_date FROM comments`
+	query := `SELECT id, answer_id, Username, comment_text, reported, created_date, updated_date FROM comments`
+	comments, err := r.fetch(query, "")
+	return comments, err
+}
+
+func (r *Repository) GetReported() ([]models.Comment, error) {
+	var comments []models.Comment
+	query := `SELECT id, answer_id, Username, comment_text, reported, created_date, updated_date FROM comments WHERE reported = true`
 	comments, err := r.fetch(query, "")
 	return comments, err
 }
 
 func (r *Repository) GetAllByAnswer(answerId string) ([]models.Comment, error) {
 	var comments []models.Comment
-	query := `SELECT id, answer_id, Username, comment_text, created_date, updated_date FROM comments WHERE answer_id = $1`
+	query := `SELECT id, answer_id, Username, comment_text, reported, created_date, updated_date FROM comments WHERE answer_id = $1`
 	comments, err := r.fetch(query, answerId)
 	return comments, err
 }
@@ -33,7 +40,7 @@ func (r *Repository) GetAllByAnswer(answerId string) ([]models.Comment, error) {
 func (r *Repository) GetById(id string) (models.Comment, error) {
 	var comment models.Comment
 
-	query := `SELECT id, answer_id, Username, comment_text, created_date, updated_date FROM comments WHERE comment_id = $1`
+	query := `SELECT id, answer_id, Username, comment_text, reported, created_date, updated_date FROM comments WHERE comment_id = $1`
 	comment, err := r.getOne(query, id)
 	return comment, err
 }
@@ -77,7 +84,7 @@ func (r *Repository) fetch(query string, answerID string) ([]models.Comment, err
 	result := make([]models.Comment, 0)
 	for rows.Next() {
 		commentDB := models.CommentDB{}
-		err := rows.Scan(&commentDB.ID, &commentDB.AnswerID, &commentDB.Username, &commentDB.Text, &commentDB.CreatedDate, &commentDB.UpdatedDate)
+		err := rows.Scan(&commentDB.ID, &commentDB.AnswerID, &commentDB.Username, &commentDB.Text, &commentDB.Reported, &commentDB.CreatedDate, &commentDB.UpdatedDate)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				continue
@@ -92,7 +99,7 @@ func (r *Repository) fetch(query string, answerID string) ([]models.Comment, err
 
 func (r *Repository) getOne(query string, id string) (models.Comment, error) {
 	commentDB := models.CommentDB{}
-	err := r.dbClient.QueryRow(query, id).Scan(&commentDB.ID, &commentDB.AnswerID, &commentDB.Username, &commentDB.Text, &commentDB.CreatedDate, &commentDB.UpdatedDate)
+	err := r.dbClient.QueryRow(query, id).Scan(&commentDB.ID, &commentDB.AnswerID, &commentDB.Username, &commentDB.Text, &commentDB.Reported, &commentDB.CreatedDate, &commentDB.UpdatedDate)
 	if err != nil && err != sql.ErrNoRows {
 		log.Infof("Fehler beim Lesen der Daten: %v", err)
 	}

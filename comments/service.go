@@ -26,6 +26,15 @@ func (s *Service) GetAll() ([]models.Comment, error) {
 	return comments, err
 }
 
+func (s *Service) GetReported() ([]models.Comment, error) {
+	comments, err := s.commentsRepo.GetReported()
+	if err != nil {
+		log.Warnf("CommentService.GetAll() Could not Load Comments: %s", err)
+		return comments, err
+	}
+	return comments, err
+}
+
 func (s *Service) GetAllByAnswer(answerId string, userId string) ([]models.Comment, error) {
 	comments, err := s.commentsRepo.GetAllByAnswer(answerId)
 	if err != nil {

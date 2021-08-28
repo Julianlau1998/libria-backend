@@ -7,3 +7,9 @@ func IsAuthorized(cookie []string) bool {
 	// return false
 	return true
 }
+
+func Admins() [1]string {
+	var admins [1]string
+	admins[0] = "auth0|61140120b66da800691207c2"
+	return admins
+}

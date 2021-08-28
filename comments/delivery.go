@@ -1,7 +1,6 @@
 package comments
 
 import (
-	"fmt"
 	"libria/auth"
 	"libria/models"
 	"net/http"
@@ -21,6 +20,14 @@ func NewDelivery(commentService Service) Delivery {
 
 func (d *Delivery) GetAll(c echo.Context) error {
 	comments, err := d.commentService.GetAll()
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	return c.JSON(http.StatusOK, comments)
+}
+
+func (d *Delivery) GetReported(c echo.Context) error {
+	comments, err := d.commentService.GetReported()
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
@@ -84,7 +91,6 @@ func (d *Delivery) Update(c echo.Context) (err error) {
 	}
 	comment, err := d.commentService.Update(id, requestBody)
 	if err != nil {
-		fmt.Println(err)
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, comment)
@@ -106,7 +112,6 @@ func (d *Delivery) Delete(c echo.Context) (err error) {
 	// }
 	comment, err := d.commentService.Delete(id)
 	if err != nil {
-		fmt.Println(err)
 		return c.String(http.StatusBadRequest, err.Error())
 	}
 	return c.JSON(http.StatusOK, comment)

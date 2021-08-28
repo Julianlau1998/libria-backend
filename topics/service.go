@@ -37,6 +37,21 @@ func (s *Service) GetAll() ([]models.Topic, error) {
 	return topics, err
 }
 
+func (s *Service) GetReported() ([]models.Topic, error) {
+	topics, err := s.topicRepo.GetReported()
+	if err != nil {
+		log.Warnf("topicsService GetAll(), could not load topics: %s", err)
+	}
+	for index, topic := range topics {
+		answers, err := s.answerService.GetAllByTopic(topic.ID, "")
+		if err != nil {
+			log.Warnf("topicsService GetAll(), could not load answers: %s", err)
+		}
+		topics[index].AmountOfAnswers = len(answers)
+	}
+	return topics, err
+}
+
 func (s *Service) GetById(id string) (models.Topic, error) {
 	topic, err := s.topicRepo.GetById(id)
 	if err != nil {
@@ -129,4 +144,11 @@ func (s *Service) Delete(id string, userId string) (models.Topic, error) {
 	topic.ID = id
 	topic.UserID = userId
 	return s.topicRepo.Delete(topic)
+}
+
+func (s *Service) DeleteAsAdmin(id string, userId string) (models.Topic, error) {
+	var topic models.Topic
+	topic.ID = id
+	topic.UserID = userId
+	return s.topicRepo.DeleteAsAdmin(topic)
 }

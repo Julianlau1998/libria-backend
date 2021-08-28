@@ -16,6 +16,7 @@ type Answer struct {
 	Votes         []Vote `json:"votes"`
 	UpvotedByMe   bool   `json:"upvoted_by_me"`
 	DownvotedByMe bool   `json:"downvoted_by_me"`
+	Reported      bool   `json:"reported"`
 }
 
 type AnswerDB struct {
@@ -26,6 +27,7 @@ type AnswerDB struct {
 	Username    sql.NullString
 	CreatedDate sql.NullString
 	UpdatedDate sql.NullString
+	Reported    sql.NullBool
 }
 
 func (dbV *AnswerDB) GetAnswer() (a Answer) {
@@ -36,5 +38,6 @@ func (dbV *AnswerDB) GetAnswer() (a Answer) {
 	a.Username = utility.GetStringValue(dbV.Username)
 	a.CreatedDate = utility.GetStringValue(dbV.CreatedDate)
 	a.UpdatedDate = utility.GetStringValue(dbV.UpdatedDate)
+	a.Reported = dbV.Reported.Bool
 	return a
 }
