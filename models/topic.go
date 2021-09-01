@@ -15,6 +15,7 @@ type Topic struct {
 	UpdatedDate     string `json:"updated_date"`
 	AmountOfAnswers int    `json:"amount_of_answers"`
 	Reported        bool   `json:"reported"`
+	Amount          int    `json:"amount"`
 }
 
 type TopicDB struct {

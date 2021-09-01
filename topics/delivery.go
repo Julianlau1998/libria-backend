@@ -4,6 +4,7 @@ import (
 	"libria/auth"
 	"libria/models"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 )
@@ -19,7 +20,11 @@ func NewDelivery(topicService Service) Delivery {
 }
 
 func (d *Delivery) GetAll(c echo.Context) error {
-	topics, err := d.topicService.GetAll()
+
+	limit, _ := strconv.ParseInt(c.QueryParam("limit"), 0, 32)
+	offset, _ := strconv.ParseInt(c.QueryParam("offset"), 0, 32)
+
+	topics, err := d.topicService.GetAll(int(limit), int(offset))
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
