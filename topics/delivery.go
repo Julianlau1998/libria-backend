@@ -23,8 +23,9 @@ func (d *Delivery) GetAll(c echo.Context) error {
 
 	limit, _ := strconv.ParseInt(c.QueryParam("limit"), 0, 32)
 	offset, _ := strconv.ParseInt(c.QueryParam("offset"), 0, 32)
+	searchText := c.QueryParam("searchText")
 
-	topics, err := d.topicService.GetAll(int(limit), int(offset))
+	topics, err := d.topicService.GetAll(int(limit), int(offset), searchText)
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}

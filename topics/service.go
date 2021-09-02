@@ -22,8 +22,8 @@ func NewService(topicRepository Repository, answerService answers.Service) Servi
 	}
 }
 
-func (s *Service) GetAll(limit int, offset int) ([]models.Topic, error) {
-	topics, err := s.topicRepo.GetAll(limit, offset)
+func (s *Service) GetAll(limit int, offset int, searchText string) ([]models.Topic, error) {
+	topics, err := s.topicRepo.GetAll(limit, offset, searchText)
 	if err != nil {
 		log.Warnf("topicsService GetAll(), could not load topics: %s", err)
 	}
@@ -77,7 +77,7 @@ func (s *Service) GetById(id string) (models.Topic, error) {
 }
 
 func (s *Service) GetRandom() (models.Topic, error) {
-	topics, err := s.GetAll(0, 0)
+	topics, err := s.GetAll(0, 0, "")
 	if err != nil {
 		log.Warnf("topicsService GetRandom(), could not load topics: %s", err)
 	}
