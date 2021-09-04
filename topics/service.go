@@ -1,10 +1,8 @@
 package topics
 
 import (
-	"fmt"
 	"libria/answers"
 	"libria/models"
-	"math/rand"
 
 	uuid "github.com/nu7hatch/gouuid"
 	log "github.com/sirupsen/logrus"
@@ -77,19 +75,24 @@ func (s *Service) GetById(id string) (models.Topic, error) {
 }
 
 func (s *Service) GetRandom() (models.Topic, error) {
-	topics, err := s.GetAll(0, 0, "")
+	// topics, err := s.GetAll(0, 0, "")
+	// if err != nil {
+	// 	log.Warnf("topicsService GetRandom(), could not load topics: %s", err)
+	// }
+	// randomIndex := rand.Intn(len(topics))
+	// randomTopic := topics[randomIndex]
+	randomTopic, err := s.topicRepo.GetRandom()
 	if err != nil {
-		log.Warnf("topicsService GetRandom(), could not load topics: %s", err)
+		log.Warnf("TopicsService.GetRandom: Could not load random topic: %s", err)
+		return randomTopic, err
 	}
-	randomIndex := rand.Intn(len(topics))
-	randomTopic := topics[randomIndex]
 	return randomTopic, err
 }
 
 func (s *Service) Post(topic *models.Topic) (*models.Topic, error) {
 	id, err := uuid.NewV4()
 	if err != nil {
-		fmt.Print(err)
+		log.Warnf("topicsService.Post: Could not creste uuid %s", err)
 		return topic, err
 	}
 	topic.ID = id.String()

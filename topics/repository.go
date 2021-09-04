@@ -48,9 +48,14 @@ func (r *Repository) GetReported() ([]models.Topic, error) {
 }
 
 func (r *Repository) GetById(id string) (models.Topic, error) {
-	var topic models.Topic
 	query := `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics WHERE topic_id = $1`
 	topic, err := r.getOne(query, id)
+	return topic, err
+}
+
+func (r *Repository) GetRandom() (models.Topic, error) {
+	query := `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics ORDER BY random() LIMIT 1`
+	topic, err := r.getOne(query, "")
 	return topic, err
 }
 
@@ -123,7 +128,12 @@ func (r *Repository) fetch(query string, limit int, offset int, searchText strin
 
 func (r *Repository) getOne(query string, id string) (models.Topic, error) {
 	topicDB := models.TopicDB{}
-	err := r.dbClient.QueryRow(query, id).Scan(&topicDB.ID, &topicDB.Username, &topicDB.Title, &topicDB.Body, &topicDB.Reported, &topicDB.CreatedDate, &topicDB.UpdatedDate)
+	var err error
+	if id == "" {
+		err = r.dbClient.QueryRow(query).Scan(&topicDB.ID, &topicDB.Username, &topicDB.Title, &topicDB.Body, &topicDB.Reported, &topicDB.CreatedDate, &topicDB.UpdatedDate)
+	} else {
+		err = r.dbClient.QueryRow(query, id).Scan(&topicDB.ID, &topicDB.Username, &topicDB.Title, &topicDB.Body, &topicDB.Reported, &topicDB.CreatedDate, &topicDB.UpdatedDate)
+	}
 	if err != nil && err != sql.ErrNoRows {
 		log.Infof("Fehler beim Lesen der Daten: %v", err)
 	}
