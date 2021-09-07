@@ -78,9 +78,9 @@ func (d *Delivery) Post(c echo.Context) error {
 func (d *Delivery) Update(c echo.Context) (err error) {
 	req := c.Request()
 	headers := req.Header
-	if !auth.IsAuthorized(headers["Cookie"]) {
-		return c.String(http.StatusUnauthorized, "unauthorized")
-	}
+	// if !auth.IsAuthorized(headers["Cookie"]) {
+	// 	return c.String(http.StatusUnauthorized, "unauthorized")
+	// }
 	id := c.Param("id")
 	requestBody := new(models.Answer)
 	if err = c.Bind(requestBody); err != nil {
