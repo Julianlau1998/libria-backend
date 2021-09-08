@@ -51,6 +51,7 @@ func (d *Delivery) GetById(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
+	answer.UserID = ""
 	return c.JSON(http.StatusOK, answer)
 }
 
@@ -86,13 +87,14 @@ func (d *Delivery) Update(c echo.Context) (err error) {
 	if err = c.Bind(requestBody); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
-	if headers.Get("UserId") != requestBody.UserID {
-		return c.String(http.StatusUnauthorized, "unauthorized")
-	}
 	answer, err := d.answerService.Update(id, requestBody)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
+	if headers.Get("userId") != answer.UserID {
+		return c.String(http.StatusUnauthorized, "unauthorized")
+	}
+	answer.UserID = ""
 	return c.JSON(http.StatusOK, answer)
 }
 

@@ -133,6 +133,10 @@ func (s *Service) Update(id string, answer *models.Answer) (models.Answer, error
 	if err != nil {
 		log.Warnf("answerService.Update() Could not update answer")
 	}
+	*answer, err = s.GetById(answer.ID)
+	if err != nil {
+		log.Warnf("answerService.Update() Could not get answerById")
+	}
 	return *answer, nil
 }
 

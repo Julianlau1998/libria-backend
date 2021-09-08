@@ -25,7 +25,7 @@ func (r *Repository) GetAll() ([]models.Answer, error) {
 
 func (r *Repository) GetReported() ([]models.Answer, error) {
 	var answers []models.Answer
-	query := `SELECT answer_id, topic_id, Username, answer, reported, created_date, updated_date FROM answers WHERE reported = true`
+	query := `SELECT answer_id, topic_id, Username, UserID, answer, reported, created_date, updated_date FROM answers WHERE reported = true`
 	answers, err := r.fetch(query, "")
 	return answers, err
 }
@@ -40,7 +40,7 @@ func (r *Repository) GetAllByTopic(topicId string) ([]models.Answer, error) {
 func (r *Repository) GetById(id string) (models.Answer, error) {
 	var answer models.Answer
 
-	query := `SELECT answer_id, topic_id, Username, answer, reported, created_date, updated_date FROM answers WHERE answer_id = $1`
+	query := `SELECT answer_id, topic_id, Username, UserID, answer, reported, created_date, updated_date FROM answers WHERE answer_id = $1`
 	answer, err := r.getOne(query, id)
 	return answer, err
 }
@@ -105,7 +105,7 @@ func (r *Repository) fetch(query string, topicID string) ([]models.Answer, error
 
 func (r *Repository) getOne(query string, id string) (models.Answer, error) {
 	answerDB := models.AnswerDB{}
-	err := r.dbClient.QueryRow(query, id).Scan(&answerDB.ID, &answerDB.TopicID, &answerDB.Username, &answerDB.Text, &answerDB.Reported, &answerDB.CreatedDate, &answerDB.UpdatedDate)
+	err := r.dbClient.QueryRow(query, id).Scan(&answerDB.ID, &answerDB.TopicID, &answerDB.Username, &answerDB.UserID, &answerDB.Text, &answerDB.Reported, &answerDB.CreatedDate, &answerDB.UpdatedDate)
 	if err != nil && err != sql.ErrNoRows {
 		log.Infof("Fehler beim Lesen der Daten: %v", err)
 	}

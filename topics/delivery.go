@@ -46,15 +46,17 @@ func (d *Delivery) GetById(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
+	topic.UserID = ""
 	return c.JSON(http.StatusOK, topic)
 }
 
 func (d *Delivery) GetRandom(c echo.Context) error {
-	topics, err := d.topicService.GetRandom()
+	topic, err := d.topicService.GetRandom()
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, topics)
+	topic.UserID = ""
+	return c.JSON(http.StatusOK, topic)
 }
 
 func (d *Delivery) Post(c echo.Context) error {
@@ -74,6 +76,7 @@ func (d *Delivery) Post(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusInternalServerError, err.Error())
 	}
+	topic.UserID = ""
 	return c.String(http.StatusOK, topic.ID)
 }
 
@@ -88,13 +91,14 @@ func (d *Delivery) Update(c echo.Context) (err error) {
 	if err = c.Bind(requestBody); err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
-	if headers.Get("UserId") != requestBody.UserID {
-		return c.String(http.StatusUnauthorized, "unauthorized")
-	}
 	topic, err := d.topicService.Update(id, requestBody)
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
+	if headers.Get("userId") != topic.UserID {
+		return c.String(http.StatusUnauthorized, "unauthorized")
+	}
+	topic.UserID = ""
 	return c.JSON(http.StatusOK, topic)
 }
 
@@ -133,5 +137,6 @@ func (d *Delivery) Delete(c echo.Context) (err error) {
 	if err != nil {
 		return c.String(http.StatusBadRequest, err.Error())
 	}
+	topic.UserID = ""
 	return c.JSON(http.StatusOK, topic)
 }

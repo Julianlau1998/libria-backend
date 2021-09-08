@@ -122,7 +122,12 @@ func (s *Service) Post(topic *models.Topic) (*models.Topic, error) {
 
 func (s *Service) Update(id string, topic *models.Topic) (models.Topic, error) {
 	topic.ID = id
-	return s.topicRepo.Update(topic)
+	_, err := s.topicRepo.Update(topic)
+	if err != nil {
+		log.Warnf("Could not update topic: %s", err)
+	}
+	*topic, err = s.GetById(topic.ID)
+	return *topic, nil
 }
 
 func (s *Service) UpdateBestAnswer(id string) (string, error) {

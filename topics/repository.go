@@ -2,9 +2,7 @@ package topics
 
 import (
 	"database/sql"
-	"fmt"
 	"libria/models"
-	"strings"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -28,7 +26,6 @@ func (r *Repository) GetAll(limit int, offset int, searchText string) ([]models.
 	} else {
 		query = `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics ORDER BY created_date DESC LIMIT $1 Offset $2`
 	}
-	fmt.Print(strings.ToLower(searchText))
 	topics, err := r.fetch(query, limit, offset, searchText)
 	return topics, err
 }
@@ -42,19 +39,19 @@ func (r *Repository) CountAll() (int, error) {
 
 func (r *Repository) GetReported() ([]models.Topic, error) {
 	var topics []models.Topic
-	query := `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics WHERE reported = true`
+	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics OFFSET floor(random() * (SELECTCOUNT(*)FROM topics)) LIMIT 1;`
 	topics, err := r.fetch(query, 0, 0, "")
 	return topics, err
 }
 
 func (r *Repository) GetById(id string) (models.Topic, error) {
-	query := `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics WHERE topic_id = $1`
+	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics WHERE topic_id = $1`
 	topic, err := r.getOne(query, id)
 	return topic, err
 }
 
 func (r *Repository) GetRandom() (models.Topic, error) {
-	query := `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics ORDER BY random() LIMIT 1`
+	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics ORDER BY random() LIMIT 1`
 	topic, err := r.getOne(query, "")
 	return topic, err
 }
@@ -130,9 +127,9 @@ func (r *Repository) getOne(query string, id string) (models.Topic, error) {
 	topicDB := models.TopicDB{}
 	var err error
 	if id == "" {
-		err = r.dbClient.QueryRow(query).Scan(&topicDB.ID, &topicDB.Username, &topicDB.Title, &topicDB.Body, &topicDB.Reported, &topicDB.CreatedDate, &topicDB.UpdatedDate)
+		err = r.dbClient.QueryRow(query).Scan(&topicDB.ID, &topicDB.Username, &topicDB.UserID, &topicDB.Title, &topicDB.Body, &topicDB.Reported, &topicDB.CreatedDate, &topicDB.UpdatedDate)
 	} else {
-		err = r.dbClient.QueryRow(query, id).Scan(&topicDB.ID, &topicDB.Username, &topicDB.Title, &topicDB.Body, &topicDB.Reported, &topicDB.CreatedDate, &topicDB.UpdatedDate)
+		err = r.dbClient.QueryRow(query, id).Scan(&topicDB.ID, &topicDB.Username, &topicDB.UserID, &topicDB.Title, &topicDB.Body, &topicDB.Reported, &topicDB.CreatedDate, &topicDB.UpdatedDate)
 	}
 	if err != nil && err != sql.ErrNoRows {
 		log.Infof("Fehler beim Lesen der Daten: %v", err)
