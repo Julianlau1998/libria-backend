@@ -74,6 +74,19 @@ func (s *Service) GetById(id string) (models.Topic, error) {
 	return topic, nil
 }
 
+func (s *Service) GetByTopicName(topicName string) (models.Topic, error) {
+	topic, err := s.topicRepo.GetByTopicName(topicName)
+	if err != nil {
+		log.Warnf("topicsService GetByTopicName(), could not load topic by name: %s", err)
+	}
+	answers, err := s.answerService.GetAllByTopic(topic.ID, "")
+	if err != nil {
+		log.Warnf("topicsService GetByTopicName(), could not load answers: %s", err)
+	}
+	topic.AmountOfAnswers = len(answers)
+	return topic, nil
+}
+
 func (s *Service) GetRandom() (models.Topic, error) {
 	// topics, err := s.GetAll(0, 0, "")
 	// if err != nil {

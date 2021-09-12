@@ -50,6 +50,16 @@ func (d *Delivery) GetById(c echo.Context) error {
 	return c.JSON(http.StatusOK, topic)
 }
 
+func (d *Delivery) GetByTopicName(c echo.Context) error {
+	topicName := c.Param("topicName")
+	topic, err := d.topicService.GetByTopicName(topicName)
+	if err != nil {
+		return c.String(http.StatusInternalServerError, err.Error())
+	}
+	topic.UserID = ""
+	return c.JSON(http.StatusOK, topic)
+}
+
 func (d *Delivery) GetRandom(c echo.Context) error {
 	topic, err := d.topicService.GetRandom()
 	if err != nil {

@@ -50,6 +50,12 @@ func (r *Repository) GetById(id string) (models.Topic, error) {
 	return topic, err
 }
 
+func (r *Repository) GetByTopicName(topicName string) (models.Topic, error) {
+	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics WHERE LOWER(title) ILIKE '%' || $1 || '%' LIMIT 1`
+	topic, err := r.getOne(query, topicName)
+	return topic, err
+}
+
 func (r *Repository) GetRandom() (models.Topic, error) {
 	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics ORDER BY random() LIMIT 1`
 	topic, err := r.getOne(query, "")
