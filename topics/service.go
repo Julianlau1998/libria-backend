@@ -49,12 +49,12 @@ func (s *Service) CountAll() (int, error) {
 func (s *Service) GetReported() ([]models.Topic, error) {
 	topics, err := s.topicRepo.GetReported()
 	if err != nil {
-		log.Warnf("topicsService GetAll(), could not load topics: %s", err)
+		log.Warnf("topicsService GetReported(), could not load topics: %s", err)
 	}
 	for index, topic := range topics {
 		answers, err := s.answerService.GetAllByTopic(topic.ID, "")
 		if err != nil {
-			log.Warnf("topicsService GetAll(), could not load answers: %s", err)
+			log.Warnf("topicsService GeGetReportedtAll(), could not load answers: %s", err)
 		}
 		topics[index].AmountOfAnswers = len(answers)
 	}

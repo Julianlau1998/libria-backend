@@ -39,57 +39,57 @@ func (r *Repository) CountAll() (int, error) {
 
 func (r *Repository) GetReported() ([]models.Topic, error) {
 	var topics []models.Topic
-	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics OFFSET floor(random() * (SELECTCOUNT(*)FROM topics)) LIMIT 1;`
+	query := `SELECT topic_id, Username, title, body, reported, created_date, updated_date FROM topics WHERE reported = true;`
 	topics, err := r.fetch(query, 0, 0, "")
 	return topics, err
 }
 
 func (r *Repository) GetById(id string) (models.Topic, error) {
-	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics WHERE topic_id = $1`
+	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics WHERE topic_id = $1;`
 	topic, err := r.getOne(query, id)
 	return topic, err
 }
 
 func (r *Repository) GetByTopicName(topicName string) (models.Topic, error) {
-	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics WHERE LOWER(title) ILIKE '%' || $1 || '%' LIMIT 1`
+	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics WHERE LOWER(title) ILIKE '%' || $1 || '%' LIMIT 1;`
 	topic, err := r.getOne(query, topicName)
 	return topic, err
 }
 
 func (r *Repository) GetRandom() (models.Topic, error) {
-	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics ORDER BY random() LIMIT 1`
+	query := `SELECT topic_id, Username, UserID, title, body, reported, created_date, updated_date FROM topics ORDER BY random() LIMIT 1;`
 	topic, err := r.getOne(query, "")
 	return topic, err
 }
 
 func (r *Repository) Post(topic *models.Topic) (*models.Topic, error) {
-	statement := `INSERT INTO topics (topic_id, title, body, created_date, UserId, Username) VALUES ($1, $2, $3, $4, $5, $6)`
+	statement := `INSERT INTO topics (topic_id, title, body, created_date, UserId, Username) VALUES ($1, $2, $3, $4, $5, $6);`
 	_, err := r.dbClient.Exec(statement, topic.ID, topic.Title, topic.Body, time.Now(), topic.UserID, topic.Username)
 	return topic, err
 }
 
 func (r *Repository) Update(topic *models.Topic) (models.Topic, error) {
-	query := `UPDATE topics SET title = $1, body = $2, updated_date = $3 WHERE topic_id = $4`
+	query := `UPDATE topics SET title = $1, body = $2, updated_date = $3 WHERE topic_id = $4;`
 	_, err := r.dbClient.Exec(query, topic.Title, topic.Body, time.Now(), topic.ID)
 
 	return *topic, err
 }
 
 func (r *Repository) UpdateBestAnswer(topic *models.Topic) (models.Topic, error) {
-	query := `UPDATE topics SET body = $1, updated_date = $2 WHERE topic_id = $3`
+	query := `UPDATE topics SET body = $1, updated_date = $2 WHERE topic_id = $3;`
 	_, err := r.dbClient.Exec(query, topic.Body, time.Now(), topic.ID)
 
 	return *topic, err
 }
 
 func (r *Repository) Delete(topic models.Topic) (models.Topic, error) {
-	query := `DELETE FROM topics WHERE topic_id = $1 AND UserID = $2`
+	query := `DELETE FROM topics WHERE topic_id = $1 AND UserID = $2;`
 	_, err := r.dbClient.Exec(query, topic.ID, topic.UserID)
 	return topic, err
 }
 
 func (r *Repository) DeleteAsAdmin(topic models.Topic) (models.Topic, error) {
-	query := `DELETE FROM topics WHERE topic_id = $1`
+	query := `DELETE FROM topics WHERE topic_id = $1;`
 	_, err := r.dbClient.Exec(query, topic.ID)
 	return topic, err
 }
